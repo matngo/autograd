@@ -60,6 +60,15 @@ class Tensor:
     def __sub__(self, other:"Tensor") -> "Tensor":
         return self + -other
 
+    def __mul__(self, other:"Tensor") -> "Tensor":
+        return F.multiply(self, other)
+
+    def __truediv__(self, other:"Tensor") -> "Tensor":
+        return F.divide(self, other)
+
+    def __inv__(self) -> "Tensor":
+        return F.invert(self)
+
     @property
     def shape(self) -> tuple:
         return self.data.shape
@@ -79,12 +88,12 @@ class Tensor:
             if self.shape == ():
                 grad = np.array(1.)
             else: 
-                raise RuntimeError()
+                raise RuntimeError("Must have a backward grad")
 
         else:
             grad = ensure_array(grad)
 
-        self.grad += grad
+        self.grad = self.grad +  grad
         
         for dependency in self.depends_on:
             backward_grad = dependency.grad_fn(self.grad)
