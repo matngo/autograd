@@ -159,3 +159,16 @@ def test_divide_backward():
     w.backward([1, 1, 1])
     np.testing.assert_almost_equal(u.grad, 1/v.data)
     np.testing.assert_almost_equal(v.grad, [2, 1.5, 2.])
+
+
+def test_matmul():
+    u = Tensor([[1, 2, 3], [1, 2, 3]], requires_grad=True) # (2, 3)
+    v = Tensor(np.array([[1], [2], [3]]), requires_grad=True) # (3, 1)
+    w = u @ v
+    assert w.shape == (2, 1)
+    backward_grad = np.array([[1], [1]])
+    w.backward(backward_grad)
+    np.testing.assert_equal(u.grad, backward_grad @ v.data.T)
+    assert u.grad.shape == u.data.shape
+    np.testing.assert_equal(v.grad, u.data.T @ backward_grad)
+    assert v.grad.shape == v.data.shape

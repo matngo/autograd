@@ -63,6 +63,9 @@ class Tensor:
     def __mul__(self, other:"Tensor") -> "Tensor":
         return F.multiply(self, other)
 
+    def __matmul__(self, other:"Tensor") -> "Tensor":
+        return F.dot(self, other)
+
     def __truediv__(self, other:"Tensor") -> "Tensor":
         return F.divide(self, other)
 

@@ -132,3 +132,23 @@ def inverse(u: "Tensor") -> "Tensor":
 
 def divide(u: "Tensor", v: "Tensor") -> "Tensor":
     return u * inverse(v)
+
+
+def dot(u: "Tensor", v: "Tensor") -> "Tensor":
+    data = u.data @ v.data
+    requires_grad = u.requires_grad or v.requires_grad
+    depends_on = []
+    if u.requires_grad:
+        def grad_fn_1(grad: np.ndarray) -> np.ndarray:
+            return grad @ v.data.T
+
+        depends_on.append(T.Dependency(u, grad_fn_1))
+
+
+    if v.requires_grad:
+        def grad_fn_2(grad: np.ndarray) -> np.ndarray:
+            return u.data.T @ grad
+
+        depends_on.append(T.Dependency(v, grad_fn_2))
+
+    return T.Tensor(data, requires_grad, depends_on)
