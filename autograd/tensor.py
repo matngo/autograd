@@ -42,31 +42,33 @@ class Tensor:
         self.data = ensure_array(data)
         self.requires_grad = requires_grad
         self.depends_on = depends_on or []
-        self.grad:Optional[np.ndarray] = None
+        self.grad: Optional[np.ndarray] = None
 
         if self.requires_grad:
             self.zero_grad()
 
-    
-    def __add__(self, other:"Tensor") -> "Tensor":
+    def __repr__(self) -> str:
+        return f"Tensor({self.data}, requires_grad={self.requires_grad})"
+
+    def __add__(self, other: "Tensor") -> "Tensor":
         return F.add(self, other)
 
-    def __radd__(self, other:"Tensor") -> "Tensor":
+    def __radd__(self, other: "Tensor") -> "Tensor":
         return F.add(self, other)
 
     def __neg__(self) -> "Tensor":
         return F.opposite(self)
 
-    def __sub__(self, other:"Tensor") -> "Tensor":
+    def __sub__(self, other: Tensorable) -> "Tensor":
         return self + -other
 
-    def __mul__(self, other:"Tensor") -> "Tensor":
+    def __mul__(self, other: "Tensor") -> "Tensor":
         return F.multiply(self, other)
 
-    def __matmul__(self, other:"Tensor") -> "Tensor":
+    def __matmul__(self, other: "Tensor") -> "Tensor":
         return F.dot(self, other)
 
-    def __truediv__(self, other:"Tensor") -> "Tensor":
+    def __truediv__(self, other: "Tensor") -> "Tensor":
         return F.divide(self, other)
 
     def __inv__(self) -> "Tensor":
@@ -85,19 +87,19 @@ class Tensor:
     def list(self) -> list:
         return self.numpy().tolist()
 
-    def backward(self, grad: Arrayable=None) -> np.ndarray:
+    def backward(self, grad: Arrayable = None) -> np.ndarray:
         assert self.requires_grad, "called backward on a non requires_grad tensor"
         if grad is None:
             if self.shape == ():
-                grad = np.array(1.)
-            else: 
+                grad = np.array(1.0)
+            else:
                 raise RuntimeError("Must have a backward grad")
 
         else:
             grad = ensure_array(grad)
 
-        self.grad = self.grad +  grad
-        
+        self.grad = self.grad + grad
+
         for dependency in self.depends_on:
             backward_grad = dependency.grad_fn(self.grad)
             dependency.tensor.backward(backward_grad)
