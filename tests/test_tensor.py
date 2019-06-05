@@ -143,7 +143,7 @@ def test_inverse():
     v = F.inverse(u)
     v.backward([1, 1, 1])
     np.testing.assert_almost_equal(v.data, [1, 1/4, 1/9])
-    np.testing.assert_almost_equal(u.grad, [1/2, 1/4, 1/6])
+    np.testing.assert_almost_equal(u.grad, [-1, -1/16, -1/81])
 
 
 def test_divide():
@@ -158,7 +158,7 @@ def test_divide_backward():
     w = u/v
     w.backward([1, 1, 1])
     np.testing.assert_almost_equal(u.grad, 1/v.data)
-    np.testing.assert_almost_equal(v.grad, [2, 1.5, 2.])
+    np.testing.assert_almost_equal(v.grad, [-4, -6/16, -12/81])
 
 
 def test_matmul():

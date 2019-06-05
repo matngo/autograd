@@ -124,7 +124,7 @@ def inverse(u: "Tensor") -> "Tensor":
     requires_grad = u.requires_grad
 
     def grad_fn(grad: np.ndarray) -> np.ndarray:
-        return grad / (2 * np.sqrt(u.data))
+        return - grad / (u.data ** 2)
 
     depends_on = [T.Dependency(u, grad_fn)]
 
