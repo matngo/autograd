@@ -3,6 +3,7 @@ from typing import Union, Sequence, List, NamedTuple, Callable, Optional
 from . import functional as F
 
 Arrayable = Union[Sequence[float], float, np.ndarray]
+Tensorable = Union[Arrayable, "Tensor"]
 
 
 class Dependency(NamedTuple):
@@ -18,6 +19,14 @@ def ensure_array(arrayable: Arrayable) -> np.ndarray:
         return arrayable.astype("float32")
     else:
         return np.array(arrayable, dtype="float32")
+
+
+def ensure_tensor(tensorable: Tensorable) -> "Tensor":
+    if isinstance(tensorable, Tensor):
+        return tensorable
+
+    else:
+        return Tensor(tensorable)
 
 
 class Tensor:
@@ -55,6 +64,21 @@ class Tensor:
 
     def __radd__(self, other: "Tensor") -> "Tensor":
         return F.add(self, other)
+
+    def __iadd__(self, other: Tensorable) -> "Tensor":
+        self.data += ensure_tensor(other).data
+        self.grad = None
+        return self
+
+    def __isub__(self, other: Tensorable) -> "Tensor":
+        self.data -= ensure_tensor(other).data
+        self.grad = None
+        return self
+
+    def __imul__(self, other: Tensorable) -> "Tensor":
+        self.data *= ensure_tensor(other).data
+        self.grad = None
+        return self
 
     def __neg__(self) -> "Tensor":
         return F.opposite(self)
