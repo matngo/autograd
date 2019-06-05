@@ -152,3 +152,15 @@ def dot(u: "Tensor", v: "Tensor") -> "Tensor":
         depends_on.append(T.Dependency(v, grad_fn_2))
 
     return T.Tensor(data, requires_grad, depends_on)
+
+def sqrt(u: "Tensor") -> "Tensor":
+    data = np.sqrt(u.data)
+    requires_grad = u.requires_grad
+    depends_on = []
+    if requires_grad:
+        def grad_fn(grad: np.ndarray) -> np.ndarray:
+            return grad / 2 * np.sqrt(u.data)
+
+        depends_on.append(T.Dependency(u, grad_fn))
+
+    return T.Tensor(data, requires_grad, depends_on)

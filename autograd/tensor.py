@@ -104,3 +104,7 @@ class Tensor:
 
     def zero_grad(self):
         self.grad = np.zeros_like(self.data)
+
+
+    def sqrt(self):
+        return F.sqrt(self)
